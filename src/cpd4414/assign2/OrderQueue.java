@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package cpd4414.assign2;
 
 import java.util.ArrayDeque;
@@ -23,12 +22,16 @@ import java.util.Queue;
 
 /**
  *
- * @author Len Payne <len.payne@lambtoncollege.ca>
+ * @author Shriman Patel
  */
 public class OrderQueue {
+
     Queue<Order> orderQueue = new ArrayDeque<>();
-    
-    public void add(Order order) {
+
+    public void add(Order order) throws Exception {
+        if (order.getCustomerId().isEmpty() && order.getCustomerName().isEmpty()) {
+            throw new Exception();
+        }
         orderQueue.add(order);
         order.setTimeReceived(new Date());
     }
