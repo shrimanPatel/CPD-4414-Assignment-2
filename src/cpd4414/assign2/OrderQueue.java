@@ -17,7 +17,9 @@
 package cpd4414.assign2;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Queue;
 
 /**
@@ -27,6 +29,7 @@ import java.util.Queue;
 public class OrderQueue {
 
     Queue<Order> orderQueue = new ArrayDeque<>();
+    List<Order> orderList = new ArrayList<>();
 
     public void add(Order order) throws noCustomerException, noPurchaseException {
         if (order.getCustomerId().isEmpty() && order.getCustomerName().isEmpty()) {
@@ -44,6 +47,36 @@ public class OrderQueue {
         return orderQueue.peek();
     }
 
+    void process(Order next) throws noTimeReceivedException {
+        if (next.equals(next())) {
+            boolean isOkay = true;
+
+//            for (Purchase p : next.getListOfPurchases()) {
+//                if (Inventory.getQuantityForId(p.getProductId()) < p.getQuantity()) {
+//                    isOkay = false;
+//                }
+//            }
+//            if (isOkay) {
+            orderList.add(orderQueue.remove());
+            next.setTimeProcessed(new Date());
+//            }
+        } else if (next.getTimeReceived() == null) {
+            throw new noTimeReceivedException();
+        }
+    }
+
+    void fulfill(Order next) throws noTimeReceivedException, noTimeProcessedException {
+        if (next().getTimeReceived() == null) {
+            throw new noTimeReceivedException();
+        }
+        if(next().getTimeProcessed() == null){
+            throw new noTimeProcessedException();
+        }
+        if (orderList.contains(next)) {
+            next.setTimeFulfilled(new Date());
+        }
+    }
+
     public class noCustomerException extends Exception {
 
         public noCustomerException() {
@@ -55,6 +88,20 @@ public class OrderQueue {
 
         public noPurchaseException() {
             super("No Purchase details given!");
+        }
+    }
+
+    public class noTimeReceivedException extends Exception {
+
+        public noTimeReceivedException() {
+            super("No time received for this order");
+        }
+    }
+
+    public class noTimeProcessedException extends Exception {
+
+        public noTimeProcessedException() {
+            super("No time processed for this order");
         }
     }
 }
