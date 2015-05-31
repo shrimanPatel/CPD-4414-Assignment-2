@@ -93,7 +93,6 @@ public class OrderQueueTest {
         }
         assertTrue(didThrow);
     }
-
     
     @Test
     public void testGetNextWhenOrdersExist() throws OrderQueue.noCustomerException, OrderQueue.noPurchaseException {
@@ -110,6 +109,14 @@ public class OrderQueueTest {
         Order result = orderQueue.next();
         assertEquals(result, order);
         assertNull(result.getTimeProcessed());
+    }
+    
+    @Test
+    public void testGetNextWhenNoOrdersExist() throws OrderQueue.noCustomerException, OrderQueue.noPurchaseException {
+        OrderQueue orderQueue = new OrderQueue();
+        
+        Order result = orderQueue.next();
+        assertNull(result);
     }
 }
  
