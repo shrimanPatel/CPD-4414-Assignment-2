@@ -57,8 +57,8 @@ public class OrderQueueTest {
     public void testWhenCustomerExistsAndPurchasesExistThenTimeReceivedIsNow() throws Exception {
         OrderQueue orderQueue = new OrderQueue();
         Order order = new Order("CUST00001", "ABC Cafeteria");
-        order.addPurchase(new Purchase("PROD0004", 450));
-        order.addPurchase(new Purchase("PROD0006", 250));
+        order.addPurchase(new Purchase(1, 8));
+        order.addPurchase(new Purchase(2, 4));
         orderQueue.add(order);
 
         long expResult = new Date().getTime();
@@ -71,8 +71,8 @@ public class OrderQueueTest {
         boolean didThrow = false;
         OrderQueue orderQueue = new OrderQueue();
         Order order = new Order("", "");
-        order.addPurchase(new Purchase("PROD0004", 450));
-        order.addPurchase(new Purchase("PROD0006", 250));
+        order.addPurchase(new Purchase(1, 8));
+        order.addPurchase(new Purchase(2, 4));
         try {
             orderQueue.add(order);
         } catch (OrderQueue.noCustomerException e) {
@@ -93,30 +93,66 @@ public class OrderQueueTest {
         }
         assertTrue(didThrow);
     }
-    
+
     @Test
     public void testGetNextWhenOrdersExist() throws OrderQueue.noCustomerException, OrderQueue.noPurchaseException {
         OrderQueue orderQueue = new OrderQueue();
-        
+
         Order order = new Order("SomeValues", "OtherValues");
-        order.addPurchase(new Purchase("id", 8));
+        order.addPurchase(new Purchase(1, 8));
         orderQueue.add(order);
-        
+
         Order order2 = new Order("SomeValues", "OtherValues");
-        order2.addPurchase(new Purchase("id", 4));
+        order2.addPurchase(new Purchase(2, 4));
         orderQueue.add(order2);
 
         Order result = orderQueue.next();
         assertEquals(result, order);
         assertNull(result.getTimeProcessed());
     }
-    
+
     @Test
     public void testGetNextWhenNoOrdersExist() throws OrderQueue.noCustomerException, OrderQueue.noPurchaseException {
         OrderQueue orderQueue = new OrderQueue();
-        
+
         Order result = orderQueue.next();
         assertNull(result);
     }
+
+    @Test
+    public void testProcessIfTimeReceivedIsSet() throws OrderQueue.noCustomerException, OrderQueue.noPurchaseException, OrderQueue.noTimeReceivedException {
+        OrderQueue orderQueue = new OrderQueue();
+
+        Order order = new Order("SomeValues", "OtherValues");
+        order.addPurchase(new Purchase(1, 8));
+        orderQueue.add(order);
+
+        Order order2 = new Order("SomeValues", "OtherValues");
+        order2.addPurchase(new Purchase(2, 4));
+        orderQueue.add(order2);
+
+        Order next = orderQueue.next();
+        orderQueue.process(next);
+
+        long expResult = new Date().getTime();
+        long result = next.getTimeReceived().getTime();
+        assertTrue(Math.abs(result - expResult) < 1000);
+    }
+
+    @Test
+    public void testProcessIfTimeReceivedIsNotSet() {
+        boolean didThrow = false;
+        OrderQueue orderQueue = new OrderQueue();
+
+        Order order = new Order("SomeValues", "OtherValues");
+        order.addPurchase(new Purchase(1, 8));
+
+        try {
+            orderQueue.process(order);
+        } catch (OrderQueue.noTimeReceivedException e) {
+            didThrow = true;
+        }
+
+        assertTrue(didThrow);
+    }
 }
- 
