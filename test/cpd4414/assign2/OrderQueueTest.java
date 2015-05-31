@@ -135,7 +135,7 @@ public class OrderQueueTest {
         orderQueue.process(next);
 
         long expResult = new Date().getTime();
-        long result = next.getTimeReceived().getTime();
+        long result = next.getTimeProcessed().getTime();
         assertTrue(Math.abs(result - expResult) < 1000);
     }
 
@@ -154,5 +154,26 @@ public class OrderQueueTest {
         }
 
         assertTrue(didThrow);
+    }
+    
+    @Test
+    public void testFullfillIfTimeReceivedIsSetAndItemsInStock() throws OrderQueue.noCustomerException, OrderQueue.noPurchaseException, OrderQueue.noTimeReceivedException {
+        OrderQueue orderQueue = new OrderQueue();
+
+        Order order = new Order("SomeValues", "OtherValues");
+        order.addPurchase(new Purchase(1, 8));
+        orderQueue.add(order);
+
+        Order order2 = new Order("SomeValues", "OtherValues");
+        order2.addPurchase(new Purchase(2, 4));
+        orderQueue.add(order2);
+
+        Order next = orderQueue.next();
+        orderQueue.process(next);
+
+        orderQueue.fulfill(next);
+        long expResult = new Date().getTime();
+        long result = next.getTimeFulfilled().getTime();
+        assertTrue(Math.abs(result - expResult) < 1000);
     }
 }
