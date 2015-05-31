@@ -28,11 +28,29 @@ public class OrderQueue {
 
     Queue<Order> orderQueue = new ArrayDeque<>();
 
-    public void add(Order order) throws Exception {
+    public void add(Order order) throws noCustomerException, noPurchaseException {
         if (order.getCustomerId().isEmpty() && order.getCustomerName().isEmpty()) {
-            throw new Exception();
+            throw new noCustomerException();
+        }
+
+        if (order.getListOfPurchases().isEmpty()) {
+            throw new noPurchaseException();
         }
         orderQueue.add(order);
         order.setTimeReceived(new Date());
+    }
+
+    public class noCustomerException extends Exception {
+
+        public noCustomerException() {
+            super("No customer details given!");
+        }
+    }
+
+    public class noPurchaseException extends Exception {
+
+        public noPurchaseException() {
+            super("No Purchase details given!");
+        }
     }
 }

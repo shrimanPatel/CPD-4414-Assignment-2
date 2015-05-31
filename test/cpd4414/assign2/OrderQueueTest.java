@@ -19,6 +19,7 @@ package cpd4414.assign2;
 import cpd4414.assign2.OrderQueue;
 import cpd4414.assign2.Purchase;
 import cpd4414.assign2.Order;
+import cpd4414.assign2.OrderQueue.noPurchaseException;
 import java.util.Date;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -66,21 +67,30 @@ public class OrderQueueTest {
     }
 
     @Test
-    public void testIfNoCustThenTE() {
-        //
+    public void testIfNoCustThenTE() throws OrderQueue.noPurchaseException {
         boolean didThrow = false;
         OrderQueue orderQueue = new OrderQueue();
-        Order order = new Order(null, null);
+        Order order = new Order("", "");
         order.addPurchase(new Purchase("PROD0004", 450));
         order.addPurchase(new Purchase("PROD0006", 250));
         try {
             orderQueue.add(order);
-        } catch (Exception e) {
-            //
+        } catch (OrderQueue.noCustomerException e) {
             didThrow = true;
         }
-        //
         assertTrue(didThrow);
     }
 
+    @Test
+    public void testIfNoPurchasesThenTE() throws OrderQueue.noCustomerException {
+        boolean didThrow = false;
+        OrderQueue orderQueue = new OrderQueue();
+        Order order = new Order("something", "something");
+        try {
+            orderQueue.add(order);
+        } catch (OrderQueue.noPurchaseException e) {
+            didThrow = true;
+        }
+        assertTrue(didThrow);
+    }
 }
